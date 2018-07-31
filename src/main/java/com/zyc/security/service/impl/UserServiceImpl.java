@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.zyc.baselibs.annotation.EntityFieldUtils;
 import com.zyc.baselibs.asserts.AssertThrowNonRuntime;
+import com.zyc.baselibs.entities.DataStatus;
 import com.zyc.baselibs.ex.BussinessException;
 import com.zyc.security.dao.UserMapper;
 import com.zyc.security.entities.User;
@@ -41,6 +42,8 @@ public class UserServiceImpl implements UserService {
 			throw new BussinessException("This user already exists. (id=" + user.getId() + ", username=" + user.getUsername() + ")");
 		}
 		
+		user.init();
+		
 		int result = this.userMapper.add(user);
 		
 		return result > 0 ? this.userMapper.selectById(user.getId()) : null;
@@ -67,6 +70,13 @@ public class UserServiceImpl implements UserService {
 	@Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
 	public void delete(String id) throws Exception {
 		AssertThrowNonRuntime.hasText(id, "This parameter 'id' is null or empty. (id=" + id + ")");
+		
+		User user = this.selectById(id);
+		if(user.getDatastatus().equals(DataStatus.DELETED.toString()) ) {
+			throw new BussinessException("The user was deleted. (username=" + user.getUsername() + ")");
+		} else if(user.getDatastatus().equals(DataStatus.LOCKED.toString())) {
+			throw new BussinessException("The user was locked. (username=" + user.getUsername() + ")");
+		}
 		
 		this.userMapper.delete(id);
 	}

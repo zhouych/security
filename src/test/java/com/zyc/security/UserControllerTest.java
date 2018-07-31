@@ -42,7 +42,6 @@ public class UserControllerTest {
     	
     	if(CollectionUtils.hasElement(users)) {
     		for (User user : users) {
-    			//User user = JSON.parseObject(JSON.toJSONString(o), User.class);
     			CACHE_USER.put(user.getId(), user);
 			}
     	}
@@ -127,6 +126,25 @@ public class UserControllerTest {
         	//断言：用户username是禁止修改的，用户修改失败（staus=1）
         	assertEquals(result.getStatus(), "1"); 
 		}
+    }
+    
+    @Test
+    public void deleteTest() {
+    	URI uri = URI.create("http://127.0.0.1:8081/user/delete");
+    	
+    	ResponseEntity<String> response = null;
+    	ResponseResult result = null;
+    	int count = 0;
+    	for (Map.Entry<String, User> entry : CACHE_USER.entrySet()) {
+    		response = this.testRestTemplate.postForEntity(uri, entry.getKey(), String.class);
+        	result = JSON.parseObject(response.getBody(), ResponseResult.class);
+        	
+			if(++count >= 5) {
+    			break;
+    		}
+		}
+    	
+    	
     }
 
 }

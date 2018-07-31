@@ -1,8 +1,9 @@
 package com.zyc.security.entities;
 
 import com.zyc.baselibs.annotation.EntityField;
+import com.zyc.baselibs.entities.BaseEntity;
 
-public class User implements java.io.Serializable {
+public class User extends BaseEntity implements java.io.Serializable {
 	
 	private static final long serialVersionUID = -9185122376449426262L;
 	
