@@ -13,16 +13,17 @@ import com.zyc.baselibs.annotation.EntityFieldUtils;
 import com.zyc.baselibs.asserts.AssertThrowNonRuntime;
 import com.zyc.baselibs.entities.DataStatus;
 import com.zyc.baselibs.ex.BussinessException;
+import com.zyc.baselibs.service.AbstractBaseService;
 import com.zyc.security.dao.UserMapper;
 import com.zyc.security.entities.User;
 import com.zyc.security.service.UserService;
 
 @Service
-public class UserServiceImpl implements UserService {
+public class UserServiceImpl extends AbstractBaseService implements UserService {
 
     @Autowired
     private UserMapper userMapper;
-
+    
 	@Override
 	public List<User> selectAll() {
 		return this.userMapper.selectAll();
@@ -54,16 +55,14 @@ public class UserServiceImpl implements UserService {
 	public User modify(User user) throws Exception {
 		EntityFieldUtils.verifyRequired(user);
 		
-		User old = this.selectById(user.getId());
-		if(null == old || !old.equals(user)) {
-			throw new BussinessException("This user does not exist or this user infomation does not matchs. (id=" + user.getId() + ")");
+		User entity = this.selectById(user.getId());
+		if(null == entity || !entity.equals(user)) {
+			throw new BussinessException("This user does not exist or this user infomation does not matchs. (username=" + user.getUsername() + ")");
 		}
-		
-		BeanUtils.copyProperties(user, old, EntityFieldUtils.uneditableFields(old));
-		
-		this.userMapper.update(old);
-		
-		return old;
+
+		BeanUtils.copyProperties(user, entity, EntityFieldUtils.uneditableFields(entity));
+		this.update(this.userMapper, entity, ACTION_UPDATE);
+		return entity;
 	}
 
 	@Override
@@ -71,14 +70,13 @@ public class UserServiceImpl implements UserService {
 	public void delete(String id) throws Exception {
 		AssertThrowNonRuntime.hasText(id, "This parameter 'id' is null or empty. (id=" + id + ")");
 		
-		User user = this.selectById(id);
-		if(user.getDatastatus().equals(DataStatus.DELETED.toString()) ) {
-			throw new BussinessException("The user was deleted. (username=" + user.getUsername() + ")");
-		} else if(user.getDatastatus().equals(DataStatus.LOCKED.toString())) {
-			throw new BussinessException("The user was locked. (username=" + user.getUsername() + ")");
+		User entity = this.selectById(id);
+		if(entity.getDatastatus().equals(DataStatus.DELETED.toString()) || entity.getDatastatus().equals(DataStatus.LOCKED.toString())) {
+			throw new BussinessException("The user was " + entity.getDatastatus().toLowerCase() + ". (username=" + entity.getUsername() + ")");
 		}
 		
-		this.userMapper.delete(id);
+		entity.setDatastatus(DataStatus.DELETED.toString());
+		this.update(this.userMapper, entity, ACTION_DELETE);
 	}
 
 }

@@ -67,25 +67,25 @@
 				spring-boot-starter-data-elasticsearch
 			</artifactId>
 		</dependency>
-		
+
 		<!-- https://mvnrepository.com/artifact/commons-beanutils/commons-beanutils -->
 		<dependency>
 			<groupId>commons-beanutils</groupId>
 			<artifactId>commons-beanutils</artifactId>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>com.alibaba</groupId>
 			<artifactId>fastjson</artifactId>
 			<version>1.2.13</version>
 		</dependency>
-		
+
 		<dependency>
-		    <groupId>com.sun.jna</groupId>
-		    <artifactId>jna</artifactId>
-		    <version>3.0.9</version>
+			<groupId>com.sun.jna</groupId>
+			<artifactId>jna</artifactId>
+			<version>3.0.9</version>
 		</dependency>
-		
+
 	</dependencies>
 
 	<build>

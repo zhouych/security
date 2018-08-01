@@ -1,1 +1,5 @@
 This is a project about Srping & ibatis.
+
+
+*** ibatis annotations:
+	https://blog.csdn.net/hj7jay/article/details/51907652

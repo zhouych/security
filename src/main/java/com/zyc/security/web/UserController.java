@@ -4,6 +4,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.alibaba.fastjson.JSON;
@@ -19,7 +21,8 @@ public class UserController extends BaseController {
 	@Autowired
 	private UserService userService;
 	
-	@PostMapping("/user/all")
+	@GetMapping("/user/all")
+	@ResponseBody
 	public String all() {
 		ResponseResult result = new ResponseResult();
 		
@@ -35,7 +38,8 @@ public class UserController extends BaseController {
 	}
 	
 	@GetMapping("/user/details")
-	public String details(@RequestBody String id) {
+	@ResponseBody
+	public String details(@RequestParam("id") String id) {
 		ResponseResult result = new ResponseResult();
 		
 		try {
@@ -50,6 +54,7 @@ public class UserController extends BaseController {
 	}
 
 	@PostMapping("/user/create")
+	@ResponseBody
 	public String create(@RequestBody User form) {
 		ResponseResult result = new ResponseResult();
 		
@@ -65,6 +70,7 @@ public class UserController extends BaseController {
 	}
 	
 	@PostMapping("/user/modify")
+	@ResponseBody
 	public String modify(@RequestBody User form) {
 		ResponseResult result = new ResponseResult();
 		
@@ -80,7 +86,8 @@ public class UserController extends BaseController {
 	} 
 	
 	@PostMapping("/user/delete")
-	public String delete(@RequestBody String id) {
+	@ResponseBody
+	public String delete(@RequestParam("id") String id) {
 		ResponseResult result = new ResponseResult();
 		
 		try {
