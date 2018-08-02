@@ -1,24 +1,18 @@
 package com.zyc.security.entities;
 
+import com.zyc.baselibs.annotation.DatabaseTable;
 import com.zyc.baselibs.annotation.EntityField;
 import com.zyc.baselibs.entities.BaseEntity;
 
+@DatabaseTable(name = "users")
 public class User extends BaseEntity implements java.io.Serializable {
 	
 	private static final long serialVersionUID = -9185122376449426262L;
 	
 	@EntityField(required = true, uneditable = true)
-	private String id;
-	@EntityField(required = true, uneditable = true)
 	private String username;
 	private String nickname;
-	
-	public String getId() {
-		return id;
-	}
-	public void setId(String id) {
-		this.id = id;
-	}
+
 	public String getUsername() {
 		return username;
 	}

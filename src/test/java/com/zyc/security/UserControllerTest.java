@@ -127,7 +127,7 @@ public class UserControllerTest {
         	CACHE_USER.put(nuser.getId(), nuser);
         	
         	//断言：用户修改成功（staus=0）
-        	assertEquals(result.getStatus(), "0"); 
+        	assertEquals(result.getStatus(), "0");
         	//断言：用户nickname发生改变
         	assertEquals(nuser.getNickname().equals(user.getNickname()), true);
 
@@ -135,7 +135,7 @@ public class UserControllerTest {
     		response = this.testRestTemplate.postForEntity(uri, user, String.class);
         	result = JSON.parseObject(response.getBody(), ResponseResult.class);
         	//断言：用户username是禁止修改的，用户修改失败（staus=1）
-        	assertEquals(result.getStatus(), "1"); 
+        	assertEquals(result.getStatus(), "1");
 		}
     }
     
