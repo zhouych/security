@@ -26,12 +26,12 @@ import com.alibaba.fastjson.JSON;
 import com.zyc.baselibs.commons.CollectionUtils;
 import com.zyc.baselibs.commons.StringUtils;
 import com.zyc.baselibs.entities.DataStatus;
+import com.zyc.baselibs.vo.DeleteMode;
 import com.zyc.baselibs.web.ResponseResult;
 import com.zyc.security.entities.User;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-//@MapperScan(basePackages = { "com.zyc.baselibs.dao", "com.zyc.security.dao" })
 public class UserControllerTest {
 
     @Autowired
@@ -41,7 +41,21 @@ public class UserControllerTest {
     
 	@Before
     public void init() {
-    	URI uri = URI.create("http://127.0.0.1:8081/user/all");
+		this.selectTest();
+    }
+    
+	@Test
+	public void test() {
+		this.selectTest();
+		this.createTest();
+		this.modifyTest();
+		this.deleteAndModifyAndDetailsTest();
+		this.selectTest();
+		this.deleteOnPhysicalTest();
+	}
+	
+	public void selectTest() {
+		URI uri = URI.create("http://127.0.0.1:8081/user/all");
     	ResponseEntity<String> response = this.testRestTemplate.getForEntity(uri, String.class);
     	ResponseResult result = JSON.parseObject(response.getBody(), ResponseResult.class);
 
@@ -54,9 +68,8 @@ public class UserControllerTest {
     			CACHE_USER.put(user.getId(), user);
 			}
     	}
-    }
-    
-    @Test
+	}
+	
     public void createTest() {
     	URI uri = URI.create("http://127.0.0.1:8081/user/create");
     	
@@ -105,7 +118,6 @@ public class UserControllerTest {
     	assertEquals(result.getStatus(), "1");
     }
     
-    @Test
     public void modifyTest() {
     	URI uri = URI.create("http://127.0.0.1:8081/user/modify");
     	
@@ -139,7 +151,47 @@ public class UserControllerTest {
 		}
     }
     
-    @Test
+    public void deleteOnPhysicalTest() {
+    	URI uri = URI.create("http://127.0.0.1:8081/user/delete");
+    	ResponseEntity<String> response = null;
+    	ResponseResult result = null;
+    	
+    	int count = 0;
+    	for (Map.Entry<String, User> entry : CACHE_USER.entrySet()) {
+    		entry.getValue().setDatastatus(DataStatus.LOCKED.toString());
+    		response = this.testRestTemplate.postForEntity(URI.create("http://127.0.0.1:8081/user/modify"), entry.getValue(), String.class);
+        	result = JSON.parseObject(response.getBody(), ResponseResult.class);
+        	//断言：用户修改成功（staus=0）
+        	assertEquals(result.getStatus(), "0"); 
+
+        	MultiValueMap<String, Object> request = new LinkedMultiValueMap<String, Object>();
+        	request.add("id", entry.getKey());
+        	request.add("mode", DeleteMode.PHYSICAL.toString());
+        	HttpHeaders headers = new HttpHeaders();
+            HttpEntity<MultiValueMap<String, Object>> httpEntity = new HttpEntity<MultiValueMap<String, Object>>(request, headers);
+            
+            response = this.testRestTemplate.postForEntity(uri, httpEntity, String.class);
+        	result = JSON.parseObject(response.getBody(), ResponseResult.class);
+        	//断言：对已锁定的数据进行删除，用户删除失败（staus=1）
+        	assertEquals(result.getStatus(), "1"); 
+            
+    		entry.getValue().setDatastatus(DataStatus.ENABLED.toString());
+    		response = this.testRestTemplate.postForEntity(URI.create("http://127.0.0.1:8081/user/modify"), entry.getValue(), String.class);
+        	result = JSON.parseObject(response.getBody(), ResponseResult.class);
+        	//断言：用户修改成功（staus=0）
+        	assertEquals(result.getStatus(), "0");
+
+            response = this.testRestTemplate.postForEntity(uri, httpEntity, String.class);
+        	result = JSON.parseObject(response.getBody(), ResponseResult.class);
+        	//断言：对已启用的数据进行删除，用户删除成功（staus=0）
+        	assertEquals(result.getStatus(), "0"); 
+        	
+			if(++count >= 1) {
+    			break;
+    		}
+    	}
+    }
+    
     public void deleteAndModifyAndDetailsTest() {
     	String url = "http://127.0.0.1:8081/user/delete";
     	URI uri = URI.create(url);
@@ -157,6 +209,7 @@ public class UserControllerTest {
 
         	MultiValueMap<String, Object> request = new LinkedMultiValueMap<String, Object>();
         	request.add("id", entry.getKey());
+        	request.add("mode", DeleteMode.LOGIC.toString());
         	HttpHeaders headers = new HttpHeaders();
             HttpEntity<MultiValueMap<String, Object>> httpEntity = new HttpEntity<MultiValueMap<String, Object>>(request, headers);
             
@@ -164,14 +217,6 @@ public class UserControllerTest {
         	result = JSON.parseObject(response.getBody(), ResponseResult.class);
         	//断言：对已删除或已锁定的数据进行删除，用户删除失败（staus=1）
         	assertEquals(result.getStatus(), "1"); 
-
-    		/*
-    		this.testRestTemplate.delete(url, request);
-    		response = this.testRestTemplate.getForEntity(URI.create("http://127.0.0.1:8081/user/details?id=" + entry.getKey()), String.class);
-        	result = JSON.parseObject(response.getBody(), ResponseResult.class);
-        	user = JSON.parseObject(JSON.toJSONString(result.getData()), User.class);
-        	assertEquals(user.getDatastatus().equals(DataStatus.DELETED.toString()), false); 
-        	*/
              
     		entry.getValue().setDatastatus(DataStatus.ENABLED.toString());
     		response = this.testRestTemplate.postForEntity(URI.create("http://127.0.0.1:8081/user/modify"), entry.getValue(), String.class);
@@ -179,17 +224,9 @@ public class UserControllerTest {
         	//断言：用户修改成功（staus=0）
         	assertEquals(result.getStatus(), "0"); 
 
-        	/*
-        	this.testRestTemplate.delete(url, request);
-    		response = this.testRestTemplate.getForEntity(URI.create("http://127.0.0.1:8081/user/details?id=" + entry.getKey()), String.class);
+        	response = this.testRestTemplate.postForEntity(uri, httpEntity, String.class);
         	result = JSON.parseObject(response.getBody(), ResponseResult.class);
-        	user = JSON.parseObject(JSON.toJSONString(result.getData()), User.class);
-        	assertEquals(user.getDatastatus().equals(DataStatus.DELETED.toString()), true); 
-        	*/
-
-            response = this.testRestTemplate.postForEntity(url, httpEntity, String.class);
-        	result = JSON.parseObject(response.getBody(), ResponseResult.class);
-        	//断言：对已删除或已锁定的数据进行删除，用户删除失败（staus=1）
+        	//断言：对已启用的数据进行删除，用户删除成功（staus=0）
         	assertEquals(result.getStatus(), "0"); 
         	entry.getValue().setDatastatus(DataStatus.DELETED.toString());
     		
@@ -203,8 +240,5 @@ public class UserControllerTest {
     			break;
     		}
 		}
-    	
-    	
     }
-
 }

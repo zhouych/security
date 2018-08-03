@@ -27,6 +27,14 @@ public class User extends BaseEntity implements java.io.Serializable {
 	}
 	
 	@Override
+	public User clean() {
+		super.clean();
+		this.username = null;
+		this.nickname = null;
+		return this;
+	}
+	
+	@Override
 	public String toString() {
 		return String.format("{ id: \"%s\", username: \"%s\", nickname: \"%s\" }", this.getId(), this.getUsername(), this.nickname);
 	}
