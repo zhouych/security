@@ -1,5 +1,8 @@
-This is a project about Srping & ibatis.
+This is a project about Srping & ibatis & redis.
 
 
 *** ibatis annotations:
 	https://blog.csdn.net/hj7jay/article/details/51907652
+	
+*** springboot / ibatis / redis:
+	http://www.php.cn/php-weizijiaocheng-382142.html

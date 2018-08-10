@@ -34,16 +34,10 @@ public class UserServiceImpl extends AbstractBaseService implements UserService 
 	
 	@Override
 	public User selectById(String id) {
-		//return StringUtils.isBlank(id) ? null : this.userMapper.selectById(id);
 		if(StringUtils.isBlank(id)) {
 			return null;
 		}
 		
-		User condition = new User().clean();
-		condition.setId(id);
-		
-		//List<User> users = this.userMapper.select(condition);
-		//return CollectionUtils.hasElement(users) ? users.get(0) : null;
 		return this.userMapper.load(id, User.class);
 	}
 
@@ -141,7 +135,7 @@ public class UserServiceImpl extends AbstractBaseService implements UserService 
 		User condition = new User().clean();
 		condition.setId(entity.getId());
 		condition.setVersion(entity.getVersion());
-		return this.userMapper.delete(entity)> 0;
+		return this.userMapper.delete(entity) > 0;
 	}
 
 }
