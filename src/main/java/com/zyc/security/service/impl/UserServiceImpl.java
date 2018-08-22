@@ -28,7 +28,6 @@ public class UserServiceImpl extends AbstractBaseService implements UserService 
     
 	@Override
 	public List<User> selectAll() {
-		//return this.userMapper.selectAll();
 		return this.userMapper.select(new User().clean());
 	}
 	
