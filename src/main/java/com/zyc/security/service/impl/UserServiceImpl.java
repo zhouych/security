@@ -33,11 +33,7 @@ public class UserServiceImpl extends AbstractBaseService implements UserService 
 	
 	@Override
 	public User selectById(String id) {
-		if(StringUtils.isBlank(id)) {
-			return null;
-		}
-		
-		return this.userMapper.load(id, User.class);
+		return StringUtils.isBlank(id) ? null : this.userMapper.load(id, User.class);
 	}
 
 	@Override
@@ -63,9 +59,7 @@ public class UserServiceImpl extends AbstractBaseService implements UserService 
 		}
 		
 		user.init();
-		
 		int result = this.userMapper.insert(user);
-		
 		return result > 0 ? this.selectById(user.getId()) : null;
 	}
 
@@ -110,6 +104,7 @@ public class UserServiceImpl extends AbstractBaseService implements UserService 
 		AssertThrowNonRuntime.hasText(id, "This parameter 'id' is null or empty. (id=" + id + ")");
 		
 		User entity = this.selectById(id);
+		AssertThrowNonRuntime.notNull(entity, "This user does not exist. (id=" + id + ")");
 		if(entity.getDatastatus().equals(DataStatus.DELETED.toString()) || entity.getDatastatus().equals(DataStatus.LOCKED.toString())) {
 			throw new BussinessException("The user was " + entity.getDatastatus().toLowerCase() + ". (username=" + entity.getUsername() + ")");
 		}
@@ -127,6 +122,7 @@ public class UserServiceImpl extends AbstractBaseService implements UserService 
 		AssertThrowNonRuntime.hasText(id, "This parameter 'id' is null or empty. (id=" + id + ")");
 
 		User entity = this.selectById(id);
+		AssertThrowNonRuntime.notNull(entity, "This user does not exist. (id=" + id + ")");
 		if(entity.getDatastatus().equals(DataStatus.LOCKED.toString())) {
 			throw new BussinessException("The user was " + entity.getDatastatus().toLowerCase() + ". (username=" + entity.getUsername() + ")");
 		}

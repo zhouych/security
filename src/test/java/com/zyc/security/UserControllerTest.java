@@ -47,7 +47,9 @@ public class UserControllerTest {
 	@Test
 	public void test() {
 		this.selectTest();
-		this.createTest();
+		for (int i = 0; i < 10; i++) {
+			this.createTest();
+		}
 		this.modifyTest();
 		this.deleteAndModifyAndDetailsTest();
 		this.selectTest();

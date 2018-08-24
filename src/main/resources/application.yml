@@ -2,6 +2,7 @@ server:
   port: 8081
 spring:
   datasource:
+    #url: jdbc:mysql://127.0.0.1:3306/security?useSSL=true
     url: jdbc:mysql://127.0.0.1:3306/security
     username: root
     password: root
@@ -30,4 +31,6 @@ spring:
 mybatis:
   config-location: classpath:mybatis-config.xml
   type-aliases-package: com.zyc.security.dao
+  #针对单表的CRUD已经可以通过mybatis注解与SqlProviderFactory.class结合来解决（参照com.zyc.baselibs.dao.MybatisBaseMapper），不需要mapper.xml；
+  #但是，如果需要写特定的sql会涉及到mapper.xml，这里配置的是mapper.xml的路径，所有针对mybatis的Dao接口对应的配置sql的xml都放置到该路径下。
   mapper-locations: classpath:mapper/*.xml

@@ -35,7 +35,7 @@ public class UserController extends BaseController {
 		} catch (Exception e) {
 			this.handleException(result, e, logger);
 		}
-
+		
 		return JSON.toJSONString(result);
 	}
 	

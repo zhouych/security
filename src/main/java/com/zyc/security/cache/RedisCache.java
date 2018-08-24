@@ -10,9 +10,9 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.util.Assert;
 
-import com.zyc.baselibs.SpringContextUtils;
-import com.zyc.baselibs.commons.StringUtils;
+import com.zyc.baselibs.SpringContextHolder;
 
 /**
  * 使用redis来实现mybatis的二级缓存
@@ -33,9 +33,7 @@ public class RedisCache implements Cache {
     private static final long EXPIRE_TIME_IN_MINUTES = 300;
 
     public RedisCache(String id) {
-        if (StringUtils.isBlank(id)) {
-            throw new IllegalArgumentException("The redis cache 'id' is null.");
-        }
+    	Assert.hasText(id, "The redis cache 'id' is null.");
         this.id = id;
     }
 
@@ -82,7 +80,7 @@ public class RedisCache implements Cache {
     
     @SuppressWarnings("rawtypes")
 	private RedisTemplate getRedisTemplate() {
-        return null == redisTemplate ?  redisTemplate = (RedisTemplate) SpringContextUtils.getBean("cacheRedisTemplate") : redisTemplate;
+        return null == redisTemplate ?  redisTemplate = (RedisTemplate) SpringContextHolder.getBean("cacheRedisTemplate") : redisTemplate;
     }
 
 }
