@@ -22,9 +22,16 @@ public class RedisConfig {
         return new JedisConnectionFactory();
     }
     
+    /*
 	@Bean
     public CacheManager cacheManager(RedisTemplate<?, ?> redisTemplate) {
         CacheManager cacheManager = new RedisCacheManager(redisTemplate);
+        return cacheManager;
+    }*/
+
+	@Bean
+    public CacheManager cacheManager(RedisConnectionFactory connectionFactory) {
+		CacheManager cacheManager = RedisCacheManager.create(connectionFactory);
         return cacheManager;
     }
 	
