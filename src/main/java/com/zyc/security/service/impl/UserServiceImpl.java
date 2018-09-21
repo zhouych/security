@@ -8,7 +8,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.zyc.baselibs.annotation.EntityFieldUtils;
+import com.zyc.baselibs.annotation.FieldRuleUtils;
+import com.zyc.baselibs.aop.ParamVerification;
 import com.zyc.baselibs.asserts.AssertThrowNonRuntime;
 import com.zyc.baselibs.commons.CollectionUtils;
 import com.zyc.baselibs.commons.StringUtils;
@@ -51,8 +52,9 @@ public class UserServiceImpl extends AbstractBaseService implements UserService 
 
 	@Override
 	@Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
+	@ParamVerification
 	public User create(User user) throws Exception {
-		EntityFieldUtils.verifyRequired(user);
+		FieldRuleUtils.verifyRequired(user);
 		
 		if(null != this.selectById(user.getId()) || null != this.selectByUsername(user.getUsername())) {
 			throw new BussinessException("This user already exists. (id=" + user.getId() + ", username=" + user.getUsername() + ")");
@@ -66,14 +68,14 @@ public class UserServiceImpl extends AbstractBaseService implements UserService 
 	@Override
 	@Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
 	public User modify(User user) throws Exception {
-		EntityFieldUtils.verifyRequired(user);
+		FieldRuleUtils.verifyRequired(user);
 		
 		User entity = this.selectById(user.getId());
 		if(null == entity || !entity.equals(user)) {
 			throw new BussinessException("This user does not exist or this user infomation does not matchs. (username=" + user.getUsername() + ")");
 		}
 
-		BeanUtils.copyProperties(user, entity, EntityFieldUtils.uneditableFields(entity));
+		BeanUtils.copyProperties(user, entity, FieldRuleUtils.uneditableFields(entity));
 		this.update(this.userMapper, entity, ACTION_UPDATE);
 		return entity;
 	}
