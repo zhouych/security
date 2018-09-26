@@ -2,8 +2,10 @@ package com.zyc.security.entities;
 
 import com.zyc.baselibs.annotation.DatabaseTable;
 import com.zyc.baselibs.annotation.FieldRule;
+import com.zyc.baselibs.aopv.Verifiable;
 import com.zyc.baselibs.entities.BaseEntity;
 
+@Verifiable
 @DatabaseTable(name = "users")
 public class User extends BaseEntity implements java.io.Serializable {
 	
